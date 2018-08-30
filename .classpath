@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jdk1.8.0_181"/>
+	<classpathentry kind="lib" path="C:/Users/dturi/Desktop/David/All Jar Files/cdi/cdi-api.jar"/>
+	<classpathentry kind="lib" path="C:/Users/dturi/Desktop/David/All Jar Files/cdi/cdi-api-javadoc.jar"/>
+	<classpathentry kind="lib" path="C:/Users/dturi/Desktop/David/All Jar Files/cdi/cdi-api-sources.jar"/>
+	<classpathentry kind="lib" path="C:/Users/dturi/Desktop/David/All Jar Files/JacksonJson/jackson-annotations-2.9.6.jar"/>
+	<classpathentry kind="lib" path="C:/Users/dturi/Desktop/David/All Jar Files/JacksonJson/jackson-core-2.9.6.jar"/>
+	<classpathentry kind="lib" path="C:/Users/dturi/Desktop/David/All Jar Files/JacksonJson/jackson-databind-2.9.6.jar"/>
+	<classpathentry kind="lib" path="C:/Users/dturi/Desktop/David/All Jar Files/weld/weld-se-shaded.jar"/>
+	<classpathentry kind="lib" path="C:/Users/dturi/Desktop/David/All Jar Files/weld/weld-se-shaded-sources.jar"/>
+	<classpathentry kind="lib" path="C:/Users/dturi/Desktop/David/All Jar Files/UsedLogger/logback-classic-1.2.3.jar"/>
+	<classpathentry kind="lib" path="C:/Users/dturi/Desktop/David/All Jar Files/UsedLogger/logback-core-1.2.3.jar"/>
+	<classpathentry kind="lib" path="C:/Users/dturi/Desktop/David/All Jar Files/UsedLogger/slf4j-api-1.7.25.jar"/>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
