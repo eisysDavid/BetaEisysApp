@@ -2,6 +2,7 @@ package hu.eisys.david.presenter;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreeModel;
@@ -16,7 +17,7 @@ public class MyTreeModel implements TreeModel {
 	private File root;
 	private boolean checkBox;
 	private Script script;
-	private ArrayList<String> returnValue;
+	private List<String> returnValue;
 
 	public MyTreeModel(File root, boolean checkBox, Script script) {
 		this.root = root;
@@ -47,7 +48,7 @@ public class MyTreeModel implements TreeModel {
 
 		if (!checkBox) {
 			for (int i = 0; i < file.length; i++) {
-				if (!(file[i].getName().equalsIgnoreCase(IConstans.JSON_FILE_NAME))) {
+				if (!(file[i].getName().equals(IConstans.JSON_FILE_NAME))) {
 					returnValue.add(file[i].getName());
 				}
 			}
@@ -57,7 +58,7 @@ public class MyTreeModel implements TreeModel {
 					if (srp.getType().equals(StepNames.EFIEL)) {
 						Efile efile = (Efile) srp;
 						if ((file[i].getAbsolutePath().equals(efile.getFile().getAbsolutePath())
-								|| (file[i].getName().equalsIgnoreCase(IConstans.JSON_FILE_NAME)))) {
+								|| (file[i].getName().equals(IConstans.JSON_FILE_NAME)))) {
 							help = false;
 						}
 					}

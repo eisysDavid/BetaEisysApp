@@ -115,9 +115,10 @@ public class Script {
 	public void addSteps(String normalPath, String strBuild) {
 		File[] file = new File(normalPath).listFiles();
 		for (File fl : file) {
-			if (fl.isFile()) {
-				stepContainer.add(new Efile(normalPath + File.separator + fl.getName(),
-						strBuild + File.separator + fl.getName()));
+			if (fl.isFile() && !fl.getName().equals(IConstans.JSON_FILE_NAME)) {
+				String showElement = strBuild.equals(IConstans.EMPTY_STRING) ? fl.getName()
+						: strBuild + File.separator + fl.getName();
+				stepContainer.add(new Efile(normalPath + File.separator + fl.getName(), showElement));
 			}
 		}
 	}
@@ -125,9 +126,10 @@ public class Script {
 	public void addSteps(String normalPath, String strBuild, int position) {
 		File[] file = new File(normalPath).listFiles();
 		for (File fl : file) {
-			if (fl.isFile()) {
-				stepContainer.add(position, new Efile(normalPath + File.separator + fl.getName(),
-						strBuild + File.separator + fl.getName()));
+			if (fl.isFile() && !fl.getName().equals(IConstans.JSON_FILE_NAME)) {
+				String showElement = strBuild.equals(IConstans.EMPTY_STRING) ? fl.getName()
+						: strBuild + File.separator + fl.getName();
+				stepContainer.add(position, new Efile(normalPath + File.separator + fl.getName(), showElement));
 			}
 		}
 	}

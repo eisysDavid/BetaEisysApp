@@ -19,21 +19,24 @@ import org.slf4j.LoggerFactory;
 
 import hu.eisys.david.model.*;
 import hu.eisys.david.presenter.*;
-import hu.eisys.david.view.IPopup;
-import hu.eisys.david.view.IPopupModify;
-import hu.eisys.david.view.MainWindow;
+import hu.eisys.david.view.IMyPopup;
+import hu.eisys.david.view.IModifyScript;
+import hu.eisys.david.view.IMainWindow;
 import hu.eisys.david.view.ModifyScript;
-import hu.eisys.david.view.TreePathShow;
-import hu.eisys.david.view.ViewPopupFrame;
-import hu.eisys.david.view.MyTreePath;;
+import hu.eisys.david.view.MyTreePath;
+import hu.eisys.david.view.MyPopup;
+import hu.eisys.david.view.IMyTreePath;;
 
 @ApplicationScoped
 public class Presenter {
 
 	@Inject
-	MainWindow mainWindow;
+	IMainWindow mainWindow;
 	@Inject
 	Script script;
+	@Inject
+	private IBundle res;
+
 	private final Logger LOGGER = LoggerFactory.getLogger(Presenter.class);
 	private JFileChooser jfileChooser;
 	private JsonHandler jsn;
@@ -44,7 +47,6 @@ public class Presenter {
 	private ComboButton myCombo;
 
 	public void start(@Observes ContainerInitialized startEvent) {
-		MyResourceBundle.setResource();
 
 		mainWindow.displayViewFrame();
 		jfileChooser = new JFileChooser();
@@ -59,7 +61,7 @@ public class Presenter {
 	}
 
 	@SuppressWarnings("static-access")
-	public void onSetTreePathEvent(@Observes @CDIEvent(MainWindow.SET_TREEMODEL) final ParameterDTO parameters) {
+	public void onSetTreePathEvent(@Observes @CDIEvent(IMainWindow.SET_TREEMODEL) final ParameterDTO parameters) {
 		path = parameters.getPrimaryParameter(String.class);
 		isSelected = parameters.getSecondaryParameter(0, boolean.class);
 		Component modelPath = parameters.getSecondaryParameter(1, Component.class);
@@ -67,7 +69,7 @@ public class Presenter {
 		int eventID = parameters.getSecondaryParameter(3, int.class);
 		LOGGER.debug("Key code {} , event Id {} ", keyCode, eventID);
 
-		if (eventID == MainWindow.KEY_PRESSED) {
+		if (eventID == IMainWindow.KEY_PRESSED) {
 			if (keyCode == KeyEvent.VK_ENTER) {
 
 				setTreeModel();
@@ -84,7 +86,7 @@ public class Presenter {
 				firstReload = false;
 
 			}
-		} else if (eventID == MainWindow.ACTION_LISTENER) {
+		} else if (eventID == IMainWindow.ACTION_LISTENER) {
 			if (keyCode == mainWindow.CHECKBOX_NUMBER) {
 				setTreeModel();
 				mainWindow.expandTreeNodes(0);
@@ -109,7 +111,7 @@ public class Presenter {
 		}
 	}
 
-	public void onUploadTableEvent(@Observes @CDIEvent(MainWindow.ON_UPLOADTABLE) final ParameterDTO parameters) {
+	public void onUploadTableEvent(@Observes @CDIEvent(IMainWindow.ON_UPLOADTABLE) final ParameterDTO parameters) {
 		if (parameters.getSecondaryParameter(1, String.class) != null) {
 			int keyCode = parameters.getPrimaryParameter(int.class);
 			int eventID = parameters.getSecondaryParameter(0, int.class);
@@ -120,22 +122,22 @@ public class Presenter {
 			int position = parameters.getSecondaryParameter(2, int.class);
 			int selection = parameters.getSecondaryParameter(3, int.class);
 
-			if ((eventID == MainWindow.MOUSE_LISTENER) && (keyCode == 2)) {
+			if ((eventID == IMainWindow.MOUSE_LISTENER) && (keyCode == 2)) {
 				if (position == -1) {
 					if (isDirectory) {
 						script.addSteps(element, showElement);
-						LOGGER.info(element + MyResourceBundle.myResource.getString("addContentText"));
+						LOGGER.info(element + res.getString("addContentText"));
 					} else {
 						script.addStep(new Efile(element, showElement));
-						LOGGER.info(showElement + MyResourceBundle.myResource.getString("itemAddText"));
+						LOGGER.info(showElement + res.getString("itemAddText"));
 					}
 				} else {
 					if (isDirectory) {
 						script.addSteps(element, showElement, position + 1);
-						LOGGER.info(showElement + MyResourceBundle.myResource.getString("addContentText"));
+						LOGGER.info(showElement + res.getString("addContentText"));
 					} else {
 						script.addStep(new Efile(element, showElement), position + 1);
-						LOGGER.info(element + MyResourceBundle.myResource.getString("itemAddText"));
+						LOGGER.info(element + res.getString("itemAddText"));
 					}
 				}
 				if (position != -1) {
@@ -147,22 +149,22 @@ public class Presenter {
 						+ path);
 				onCreateJsonEvent();
 
-			} else if ((eventID == MainWindow.KEY_PRESSED) && (keyCode == KeyEvent.VK_ENTER)) {
+			} else if ((eventID == IMainWindow.KEY_PRESSED) && (keyCode == KeyEvent.VK_ENTER)) {
 				if (position == -1) {
 					if (isDirectory) {
 						script.addSteps(element, showElement);
-						LOGGER.info(element + MyResourceBundle.myResource.getString("addContentText"));
+						LOGGER.info(element + res.getString("addContentText"));
 					} else {
 						script.addStep(new Efile(element, showElement));
-						LOGGER.info(showElement + MyResourceBundle.myResource.getString("itemAddText"));
+						LOGGER.info(showElement + res.getString("itemAddText"));
 					}
 				} else {
 					if (isDirectory) {
 						script.addSteps(element, showElement, position + 1);
-						LOGGER.info(element + MyResourceBundle.myResource.getString("addContentText"));
+						LOGGER.info(element + res.getString("addContentText"));
 					} else {
 						script.addStep(new Efile(element, showElement), position + 1);
-						LOGGER.info(showElement + MyResourceBundle.myResource.getString("itemAddText"));
+						LOGGER.info(showElement + res.getString("itemAddText"));
 					}
 				}
 				if (position != -1) {
@@ -182,14 +184,14 @@ public class Presenter {
 
 	}
 
-	public void onExpendTreePathEvent(@Observes @CDIEvent(MainWindow.ON_TREEPOPUP) final ParameterDTO parameters) {
+	public void onExpendTreePathEvent(@Observes @CDIEvent(IMainWindow.ON_TREEPOPUP) final ParameterDTO parameters) {
 		boolean clicked = ((parameters.getPrimaryParameter(int.class)
 				& parameters.getSecondaryParameter(0, int.class)) != 0);
 
 		int selectedRow = parameters.getSecondaryParameter(1, int.class);
 
 		if (clicked) {
-			mainWindow.setTreePopup(new TreePathShow(new MyTreePath() {
+			mainWindow.setTreePopup(new MyTreePath(new IMyTreePath() {
 				public void expasndTree() {
 					mainWindow.expandTreeNodes(selectedRow);
 				}
@@ -198,36 +200,36 @@ public class Presenter {
 					mainWindow.collapseTreeNodes(selectedRow);
 
 				}
-			}));
+			}, res));
 		}
 	}
 
-	public void onExitEvent(@Observes @CDIEvent(MainWindow.ON_EXIT) final ParameterDTO parameters) {
-		int dialogButton = JOptionPane.showConfirmDialog(null, MyResourceBundle.myResource.getString("exitText"),
-				MyResourceBundle.myResource.getString("exitTitle"), JOptionPane.OK_CANCEL_OPTION);
+	public void onExitEvent(@Observes @CDIEvent(IMainWindow.ON_EXIT) final ParameterDTO parameters) {
+		int dialogButton = JOptionPane.showConfirmDialog(null, res.getString("exitText"), res.getString("exitTitle"),
+				JOptionPane.OK_CANCEL_OPTION);
 		LOGGER.info("Save: {}", dialogButton);
 		if (dialogButton == JOptionPane.YES_OPTION) {
 			mainWindow.systemExit();
 		}
 	}
 
-	public void onPopupEvent(@Observes @CDIEvent(MainWindow.ON_POPUP) final ParameterDTO parameters) {
+	public void onPopupEvent(@Observes @CDIEvent(IMainWindow.ON_POPUP) final ParameterDTO parameters) {
 		boolean clicked = ((parameters.getPrimaryParameter(int.class)
 				& parameters.getSecondaryParameter(0, int.class)) != 0);
 		Container container = parameters.getSecondaryParameter(1, Container.class);
 		int tableRow = parameters.getSecondaryParameter(2, int.class);
 		int[] removeElement = parameters.getSecondaryParameter(3, int[].class);
 		if (clicked) {
-			new ViewPopupFrame().display(container, new IPopup() {
+			new MyPopup(res).display(container, new IMyPopup() {
 				public void dbChangeEvent(String dbName, String userName, String password) {
 					if (tableRow == -1) {
 						script.addStep(new DbChange(dbName, userName, password));
 						LOGGER.info(script.getStepContainer().get(script.getStepContainer().size() - 1).getShowElement()
-								+ MyResourceBundle.myResource.getString("itemAddText"));
+								+ res.getString("itemAddText"));
 					} else {
 						script.addStep(new DbChange(dbName, userName, password), tableRow + 1);
 						LOGGER.info(script.getStepContainer().get(tableRow + 1).getShowElement()
-								+ MyResourceBundle.myResource.getString("itemAddText"));
+								+ res.getString("itemAddText"));
 					}
 					setTableModel(tableRow + 1);
 					onCreateJsonEvent();
@@ -237,11 +239,11 @@ public class Presenter {
 					if (tableRow == -1) {
 						script.addStep(new Adhock(scriptName, myScript));
 						LOGGER.info(script.getStepContainer().get(script.getStepContainer().size() - 1).getShowElement()
-								+ MyResourceBundle.myResource.getString("itemAddText"));
+								+ res.getString("itemAddText"));
 					} else {
 						script.addStep(new Adhock(scriptName, myScript), tableRow + 1);
 						LOGGER.info(script.getStepContainer().get(tableRow + 1).getShowElement()
-								+ MyResourceBundle.myResource.getString("itemAddText"));
+								+ res.getString("itemAddText"));
 					}
 					setTableModel(tableRow + 1);
 					onCreateJsonEvent();
@@ -259,7 +261,7 @@ public class Presenter {
 
 				public void modifyDbChangeEvent(String dbName, String userName, String password) {
 					LOGGER.info(script.getStepContainer().get(tableRow).getShowElement()
-							+ MyResourceBundle.myResource.getString("itemChangeText") + userName + "@" + dbName);
+							+ res.getString("itemChangeText") + userName + "@" + dbName);
 					script.modifyDbchange(tableRow, dbName, userName, password, script.getComment(tableRow));
 					setTableModel(tableRow);
 					onCreateJsonEvent();
@@ -267,7 +269,7 @@ public class Presenter {
 
 				public void modifyScriptEvent(String scriptName, String myScript) {
 					LOGGER.info(script.getStepContainer().get(tableRow).getShowElement()
-							+ MyResourceBundle.myResource.getString("itemChangeText") + scriptName);
+							+ res.getString("itemChangeText") + scriptName);
 					script.modifyAdhock(tableRow, scriptName, myScript, script.getComment(tableRow));
 					setTableModel(tableRow);
 					onCreateJsonEvent();
@@ -277,16 +279,16 @@ public class Presenter {
 		}
 	}
 
-	public void onModifyEnterEvent(@Observes @CDIEvent(MainWindow.ON_MODIFYENTER) final ParameterDTO parameters) {
+	public void onModifyEnterEvent(@Observes @CDIEvent(IMainWindow.ON_MODIFYENTER) final ParameterDTO parameters) {
 		boolean enterPressed = (parameters.getPrimaryParameter(int.class) == KeyEvent.VK_ENTER);
 		int index = parameters.getSecondaryParameter(0, int.class);
 		int column = parameters.getSecondaryParameter(1, int.class);
 
 		if (enterPressed && column == 1) {
-			new ModifyScript().onlyModify(new IPopupModify() {
+			new ModifyScript().onlyModify(new IModifyScript() {
 				public void modifyScriptEvent(String scriptName, String myScript) {
-					LOGGER.info(script.getStepContainer().get(index).getShowElement()
-							+ MyResourceBundle.myResource.getString("itemChangeText") + scriptName);
+					LOGGER.info(script.getStepContainer().get(index).getShowElement() + res.getString("itemChangeText")
+							+ scriptName);
 					script.modifyAdhock(index, scriptName, myScript, script.getComment(index));
 					setTableModel(index);
 					onCreateJsonEvent();
@@ -298,8 +300,8 @@ public class Presenter {
 				}
 
 				public void modifyDbChangeEvent(String dbName, String userName, String password) {
-					LOGGER.info(script.getStepContainer().get(index).getShowElement()
-							+ MyResourceBundle.myResource.getString("itemChangeText") + userName + "@" + dbName);
+					LOGGER.info(script.getStepContainer().get(index).getShowElement() + res.getString("itemChangeText")
+							+ userName + "@" + dbName);
 					script.modifyDbchange(index, dbName, userName, password, script.getComment(index));
 					setTableModel(index);
 					onCreateJsonEvent();
@@ -307,23 +309,23 @@ public class Presenter {
 
 				public void removeElementEvent() {
 				}
-			}, script.getType(index));
+			}, script.getType(index), res);
 
 		}
 	}
 
 	public void onModifyDoubleClickEvent(
-			@Observes @CDIEvent(MainWindow.ON_MODIFYDOUBLECLICK) final ParameterDTO parameters) {
+			@Observes @CDIEvent(IMainWindow.ON_MODIFYDOUBLECLICK) final ParameterDTO parameters) {
 		boolean doubleClicked = (parameters.getPrimaryParameter(int.class) == 2);
 		int index = parameters.getSecondaryParameter(1, int.class);
 		int column = parameters.getSecondaryParameter(2, int.class);
 		int[] removeElement = parameters.getSecondaryParameter(3, int[].class);
 
 		if (doubleClicked && column == 1) {
-			new ModifyScript().onlyModify(new IPopupModify() {
+			new ModifyScript().onlyModify(new IModifyScript() {
 				public void modifyScriptEvent(String scriptName, String myScript) {
-					LOGGER.info(script.getStepContainer().get(index).getShowElement()
-							+ MyResourceBundle.myResource.getString("itemChangeText") + scriptName);
+					LOGGER.info(script.getStepContainer().get(index).getShowElement() + res.getString("itemChangeText")
+							+ scriptName);
 					script.modifyAdhock(index, scriptName, myScript, script.getComment(index));
 					setTableModel(index);
 					onCreateJsonEvent();
@@ -335,8 +337,8 @@ public class Presenter {
 				}
 
 				public void modifyDbChangeEvent(String dbName, String userName, String password) {
-					LOGGER.info(script.getStepContainer().get(index).getShowElement()
-							+ MyResourceBundle.myResource.getString("itemChangeText") + userName + "@" + dbName);
+					LOGGER.info(script.getStepContainer().get(index).getShowElement() + res.getString("itemChangeText")
+							+ userName + "@" + dbName);
 					script.modifyDbchange(index, dbName, userName, password, script.getComment(index));
 					setTableModel(index);
 					onCreateJsonEvent();
@@ -346,13 +348,13 @@ public class Presenter {
 					removeElem(removeElement);
 					onCreateJsonEvent();
 				}
-			}, script.getType(index));
+			}, script.getType(index), res);
 
 		}
 
 	}
 
-	public void onRemoveElement(@Observes @CDIEvent(MainWindow.ON_REMOVE) final ParameterDTO parameters) {
+	public void onRemoveElement(@Observes @CDIEvent(IMainWindow.ON_REMOVE) final ParameterDTO parameters) {
 		int keyEvent = parameters.getPrimaryParameter(int.class);
 		int[] removeElement = parameters.getSecondaryParameter(0, int[].class);
 
@@ -362,7 +364,7 @@ public class Presenter {
 		}
 	}
 
-	public void onSetCommentEvent(@Observes @CDIEvent(MainWindow.ON_SETCOMMENT) final ParameterDTO parameters) {
+	public void onSetCommentEvent(@Observes @CDIEvent(IMainWindow.ON_SETCOMMENT) final ParameterDTO parameters) {
 		String comment = parameters.getPrimaryParameter(String.class);
 		int xPosition = parameters.getSecondaryParameter(0, int.class);
 		int yPosition = parameters.getSecondaryParameter(1, int.class);
@@ -376,47 +378,62 @@ public class Presenter {
 
 	}
 
-	public void onComboMoveEvent(@Observes @CDIEvent(MainWindow.ON_COMBOKEYMOVE) final ParameterDTO parameters) {
+	public void onComboMoveEvent(@Observes @CDIEvent(IMainWindow.ON_COMBOKEYMOVE) final ParameterDTO parameters) {
 		int keyCode = parameters.getPrimaryParameter(int.class);
 		int[] rowNumber = parameters.getSecondaryParameter(0, int[].class);
 		int columnNumber = parameters.getSecondaryParameter(1, int.class);
 		int getID = parameters.getSecondaryParameter(2, int.class);
-
-		if (getID == MainWindow.KEY_PRESSED) {
+		int selecTion = 0;
+		if (getID == IMainWindow.KEY_PRESSED) {
 			myCombo.setPressedbutton(keyCode);
 
 			if (myCombo.isGoUp() && (rowNumber[0] - 1 >= 0) && columnNumber == 1) {
 				script.moveStep(rowNumber, rowNumber[0] - 1, IConstans.WAY_UP);
-				setTableModel(rowNumber[0] - 1);
+				int dropPos = rowNumber[0] - 1;
+				setTableModel();
+				for (int selectedItems : rowNumber) {
+					selecTion = !script.getStepContainer().isEmpty() && rowNumber[0] - 1 < selectedItems ? dropPos++
+							: dropPos--;
+					mainWindow.setTableSelection(selecTion);
+				}
 				onCreateJsonEvent();
 			}
 
 			if (myCombo.isGoDown() && (rowNumber[rowNumber.length - 1] + 1) < script.getStepContainer().size()
 					&& columnNumber == 1) {
 				script.moveStep(rowNumber, rowNumber[rowNumber.length - 1] + 1, IConstans.WAY_DOWN);
-				setTableModel(rowNumber[rowNumber.length - 1] + 1);
+				setTableModel();
+				int dropPos = rowNumber[rowNumber.length - 1] + 1;
+				for (int selectedItems : rowNumber) {
+					selecTion = !script.getStepContainer().isEmpty() && dropPos < selectedItems ? dropPos++ : dropPos--;
+					mainWindow.setTableSelection(selecTion);
+				}
 				onCreateJsonEvent();
 			}
+
 		}
 
-		else if (getID == MainWindow.KEY_RELEASE) {
+		else if (getID == IMainWindow.KEY_RELEASE) {
 			myCombo.setReleseButton(keyCode);
 		}
 	}
 
-	public void onDND(@Observes @CDIEvent(MainWindow.ON_DND) final ParameterDTO parameters) {
+	public void onDND(@Observes @CDIEvent(IMainWindow.ON_DND) final ParameterDTO parameters) {
 		int[] arrayParam = parameters.getPrimaryParameter(int[].class);
 		int dropPos = parameters.getSecondaryParameter(0, int.class);
+		int selecTion = 0;
 		if (arrayParam[0] > dropPos) {
 			script.moveStepDND(arrayParam, dropPos, IConstans.WAY_UP);
 		} else if (arrayParam[0] < dropPos) {
 			script.moveStepDND(arrayParam, dropPos, IConstans.WAY_DOWN);
 		}
 
-		int selecTion = !script.getStepContainer().isEmpty() && dropPos - (arrayParam.length) >= 0
-				? dropPos - (arrayParam.length - 1)
-				: dropPos;
-		setTableModel(selecTion);
+		setTableModel();
+		for (int selectedItems : arrayParam) {
+			selecTion = !script.getStepContainer().isEmpty() && dropPos < selectedItems ? dropPos++ : dropPos--;
+			mainWindow.setTableSelection(selecTion);
+		}
+
 		onCreateJsonEvent();
 	}
 
@@ -424,17 +441,16 @@ public class Presenter {
 		LOGGER.debug("{}", Arrays.toString(removeElement));
 		for (int i = removeElement.length - 1; i > -1; i--) {
 			if (script.getType(removeElement[i]).equals(StepNames.ADHOCK)) {
-				int dialogButton = JOptionPane.showConfirmDialog(null,
-						MyResourceBundle.myResource.getString("deleteAdhockText"),
-						MyResourceBundle.myResource.getString("deleteAdhockTitle"), JOptionPane.OK_CANCEL_OPTION);
+				int dialogButton = JOptionPane.showConfirmDialog(null, res.getString("deleteAdhockText"),
+						res.getString("deleteAdhockTitle"), JOptionPane.OK_CANCEL_OPTION);
 				if (dialogButton == JOptionPane.YES_OPTION) {
 					LOGGER.info(script.getStepContainer().get(removeElement[i]).getShowElement()
-							+ MyResourceBundle.myResource.getString("tableRemove"));
+							+ res.getString("tableRemove"));
 					script.removeStep(script.getStepContainer().get(removeElement[i]));
 				}
 			} else {
 				LOGGER.info(script.getStepContainer().get(removeElement[i]).getShowElement()
-						+ MyResourceBundle.myResource.getString("tableRemove"));
+						+ res.getString("tableRemove"));
 				script.removeStep(script.getStepContainer().get(removeElement[i]));
 			}
 
@@ -457,7 +473,7 @@ public class Presenter {
 
 	public void setTableModel(int focus) {
 		try {
-			mainWindow.setTableMode(new MyTModel(script));
+			mainWindow.setTableMode(new MyTableModel(script));
 			mainWindow.setTableSelection(focus);
 		} catch (Exception e) {
 			LOGGER.error("", e);
@@ -466,7 +482,7 @@ public class Presenter {
 
 	public void setTableModel() {
 		try {
-			mainWindow.setTableMode(new MyTModel(script));
+			mainWindow.setTableMode(new MyTableModel(script));
 		} catch (Exception e) {
 			LOGGER.error("", e);
 		}

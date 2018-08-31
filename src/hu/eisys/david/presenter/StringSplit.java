@@ -19,11 +19,13 @@ public class StringSplit {
 
 		String sep = File.separator;
 
-		element = p[0];
-		showElement = p[0].split(sep + sep)[p[0].split(sep + sep).length - 1];
-		for (int i = 1; i < p.length; i++) {
-			element += sep + sep + p[i].split(sep + sep)[p[i].split(sep + sep).length - 1];
-			showElement += sep + sep + p[i].split(sep + sep)[p[i].split(sep + sep).length - 1];
+		int index = p.length >= 2 ? 1 : 0;
+		element = p[index];
+		showElement = index == 0 ? IConstans.EMPTY_STRING
+				: p[index].split(sep + sep)[p[index].split(sep + sep).length - 1];
+		for (int i = index + 1; i < p.length; i++) {
+			element += sep + p[i].split(sep + sep)[p[i].split(sep + sep).length - 1];
+			showElement += sep + p[i].split(sep + sep)[p[i].split(sep + sep).length - 1];
 		}
 
 		element = element.replace("]", IConstans.EMPTY_STRING);

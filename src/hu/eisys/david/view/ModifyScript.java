@@ -7,39 +7,45 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.*;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+import javax.swing.JTextField;
+import javax.swing.JTextPane;
 import javax.swing.text.JTextComponent;
 
 import hu.eisys.david.model.Adhock;
 import hu.eisys.david.model.DbChange;
 import hu.eisys.david.model.StepNames;
+import hu.eisys.david.presenter.IBundle;
 import hu.eisys.david.presenter.IConstans;
-import hu.eisys.david.presenter.MyResourceBundle;
 
 public class ModifyScript {
 
-	public void onlyModify(IPopupModify ipopUpModify, StepNames stepType) {
+	public void onlyModify(IModifyScript ipopUpModify, StepNames stepType, IBundle res) {
 		this.ipopUpModify = ipopUpModify;
 		if (stepType.equals(StepNames.DBCHANGE) || stepType.equals(StepNames.ADHOCK)) {
-			onlyModify();
+			onlyModify(res);
 		} else {
 			ipopUpModify.removeElementEvent();
 		}
 
 	}
 
-	public void onlyModify() {
+	public void onlyModify(IBundle res) {
 
 		if (ipopUpModify.modifyEvent() instanceof DbChange) {
 			DbChange myDbChange = (DbChange) ipopUpModify.modifyEvent();
-			frame = new JFrame(MyResourceBundle.myResource.getString("frameDb"));
-			dbNameL = new JLabel(MyResourceBundle.myResource.getString("dbNameL"));
-			userNameL = new JLabel(MyResourceBundle.myResource.getString("userNameL"));
-			passwordL = new JLabel(MyResourceBundle.myResource.getString("passwordL"));
+			frame = new JFrame(res.getString("frameDb"));
+			dbNameL = new JLabel(res.getString("dbNameL"));
+			userNameL = new JLabel(res.getString("userNameL"));
+			passwordL = new JLabel(res.getString("passwordL"));
 			dbName = new JTextField(20);
 			userName = new JTextField(20);
 			password = new JTextField(20);
-			modify = new JButton(MyResourceBundle.myResource.getString("modify"));
+			modify = new JButton(res.getString("modify"));
 			dbName.setText(myDbChange.getDbName());
 			userName.setText(myDbChange.getUserName());
 			password.setText(myDbChange.getPassword());
@@ -88,8 +94,8 @@ public class ModifyScript {
 
 					else {
 						int dialogButton = JOptionPane.showConfirmDialog(null,
-								MyResourceBundle.myResource.getString("noDB"),
-								MyResourceBundle.myResource.getString("noDBChange"), JOptionPane.OK_CANCEL_OPTION);
+								res.getString("noDB"),
+								res.getString("noDBChange"), JOptionPane.OK_CANCEL_OPTION);
 						if (dialogButton == JOptionPane.YES_OPTION) {
 							frame.dispose();
 						}
@@ -99,14 +105,14 @@ public class ModifyScript {
 
 		} else {
 			Adhock myAdhock = (Adhock) ipopUpModify.modifyEvent();
-			frame = new JFrame(MyResourceBundle.myResource.getString("frameAd"));
+			frame = new JFrame(res.getString("frameAd"));
 			scriptName = new JTextField(20);
 			myScript = new JTextPane();
 			myScript.setFont(new Font("Consolas", Font.PLAIN, 14));
 			JScrollPane scrollPane = new JScrollPane(myScript);
-			scriptNameL = new JLabel(MyResourceBundle.myResource.getString("scriptNameL"));
-			myScriptL = new JLabel(MyResourceBundle.myResource.getString("myScriptL"));
-			modify = new JButton(MyResourceBundle.myResource.getString("modify"));
+			scriptNameL = new JLabel(res.getString("scriptNameL"));
+			myScriptL = new JLabel(res.getString("myScriptL"));
+			modify = new JButton(res.getString("modify"));
 			frame.setVisible(true);
 			frame.setSize(500, 500);
 			frame.setLocationRelativeTo(null);
@@ -145,8 +151,8 @@ public class ModifyScript {
 
 					else {
 						int dialogButton = JOptionPane.showConfirmDialog(null,
-								MyResourceBundle.myResource.getString("noScript"),
-								MyResourceBundle.myResource.getString("noScriptChange"), JOptionPane.OK_CANCEL_OPTION);
+								res.getString("noScript"),
+								res.getString("noScriptChange"), JOptionPane.OK_CANCEL_OPTION);
 						if (dialogButton == JOptionPane.YES_OPTION) {
 							frame.dispose();
 						}
@@ -162,7 +168,7 @@ public class ModifyScript {
 	private JLabel dbNameL, userNameL, passwordL, scriptNameL, myScriptL;
 	private JButton modify;
 	private GridBagConstraints grid;
-	private IPopupModify ipopUpModify;
+	private IModifyScript ipopUpModify;
 	private Insets insets;
 
 }

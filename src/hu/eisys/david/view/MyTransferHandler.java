@@ -17,7 +17,7 @@ public class MyTransferHandler extends TransferHandler {
 
 	private int startPositionRow;
 	private int startPositionCol;
-	private IUpdate iUpdate;
+	private IMyTransferHandler iUpdate;
 
 	public int getSourceActions(JComponent c) {	
 		return DnDConstants.ACTION_COPY_OR_MOVE;
@@ -71,7 +71,7 @@ public class MyTransferHandler extends TransferHandler {
 			return imported;
 	}
 
-	public MyTransferHandler(IUpdate iUpdate) {
+	public MyTransferHandler(IMyTransferHandler iUpdate) {
 		this.iUpdate = iUpdate;
 	}
 
