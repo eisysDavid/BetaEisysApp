@@ -96,7 +96,7 @@ public class Presenter {
 					path = jfileChooser.getSelectedFile().getPath();
 					mainWindow.setStringPath(path);
 					mainWindow.setTreeModel(new MyTreeModel(jfileChooser.getSelectedFile(), isSelected, script));
-					if (jsn.isJSON(jfileChooser.getSelectedFile().getAbsolutePath()) && firstReload) {
+					if (jsn.isJSON(path) && firstReload) {
 						try {
 							script = (Script) jsn.reloadJSon(path);
 							setTableModel();

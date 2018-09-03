@@ -38,6 +38,7 @@ public class JsonHandler {
 		if (new File(path).exists()) {
 			File[] file = new File(path).listFiles();
 			for (File f : file) {
+				f.setReadable(true);
 				if (f.getName().equals(IConstans.JSON_FILE_NAME)) {
 					isJSON = true;
 				}
