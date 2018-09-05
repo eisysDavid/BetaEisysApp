@@ -54,12 +54,16 @@ public class MyTreeModel implements TreeModel {
 			}
 		} else {
 			for (int i = 0; i < file.length; i++) {
-				for (Step srp : script.getStepContainer()) {
-					if (srp.getType().equals(StepNames.EFIEL)) {
-						Efile efile = (Efile) srp;
-						if ((file[i].getAbsolutePath().equals(efile.getFile().getAbsolutePath())
-								|| (file[i].getName().equals(IConstans.JSON_FILE_NAME)))) {
-							help = false;
+
+				if ((file[i].getName().equals(IConstans.JSON_FILE_NAME))) {
+					help = false;
+				} else {
+					for (Step srp : script.getStepContainer()) {
+						if (srp.getType().equals(StepNames.EFIEL)) {
+							Efile efile = (Efile) srp;
+							if ((file[i].getAbsolutePath().equals(efile.getFile().getAbsolutePath()))) {
+								help = false;
+							}
 						}
 					}
 				}
